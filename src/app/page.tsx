@@ -1,16 +1,14 @@
 "use client";
-import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
-import { brandConfig } from "@/lib/mock-data";
 import { BlogInputPanel } from "@/components/blog-input/BlogInputPanel";
 import { ImagePromptSelector } from "@/components/image-prompt/ImagePromptSelector";
 import { PlatformPostGrid } from "@/components/platform-post/PlatformPostGrid";
 import { Button } from "@/components/ui/Button";
 import { PostTextOptions } from '@/components/platform-post/PostTextOptions';
-import { Checklist, ChecklistItem } from '@/components/ui/Checklist';
+import { Checklist } from '@/components/ui/Checklist';
 import { StepIndicator } from '@/components/ui/StepIndicator';
-// import { ChevronUp, ChevronDown } from "lucide-react";
 import React from "react";
+import Image from 'next/image';
 
 type GeneratedImage = {
   id: string;
@@ -122,15 +120,6 @@ export default function Home() {
       setMaxStep((m) => Math.max(m, next));
       return next;
     });
-    // setTimeout(() => {
-    //   sectionRef.current?.scrollIntoView({ behavior: "smooth" });
-    // }, 200);
-  };
-  const prevStep = () => {
-    setStep((prev) => Math.max(prev - 1, 0));
-    // setTimeout(() => {
-    //   sectionRef.current?.scrollIntoView({ behavior: "smooth" });
-    // }, 200);
   };
 
   const handleRegenerateImage = async (imgId: string) => {
@@ -172,7 +161,7 @@ export default function Home() {
         });
       }
     }
-  }, [step, blogContent, selectedPlatforms, platformPosts, selectedPrompt]);
+  }, [step, blogContent, selectedPlatforms, platformPosts, selectedPrompt, imageGenSnapshot]);
 
   // Reset images if upstream content changes before image generation step
   React.useEffect(() => {
@@ -180,7 +169,7 @@ export default function Home() {
       setGeneratedImages([]);
       setSelectedImageId('');
     }
-  }, [blogContent, selectedPlatforms, platformPosts, selectedPrompt, step]);
+  }, [step, blogContent, selectedPlatforms, platformPosts, selectedPrompt]);
 
   // Watch for changes in prior steps and restrict maxStep
   React.useEffect(() => {
@@ -188,7 +177,7 @@ export default function Home() {
     if (step < maxStep) {
       setMaxStep(step);
     }
-  }, [blogContent, selectedPlatforms, platformPosts, selectedPrompt]);
+  }, [step, maxStep, blogContent, selectedPlatforms, platformPosts, selectedPrompt]);
 
   // Scroll to the relevant section when step changes
   const prevStepRef = useRef<number | null>(null);
@@ -209,7 +198,7 @@ export default function Home() {
       }
       prevStepRef.current = step;
     }
-  }, [step]);
+  }, [step, sectionRefs]);
 
   return (
     <>
@@ -239,7 +228,7 @@ export default function Home() {
                 {step === 0 && (
                   <>
                     <p className="text-gray-700 dark:text-gray-200 mb-2">
-                      Paste your blog post, article, website URL, or any marketing content you'd like to turn into social posts. This is the starting point, so make sure the content is complete and clear.
+                      Paste your blog post, article, website URL, or any marketing content you&apos;d like to turn into social posts. This is the starting point, so make sure the content is complete and clear.
                     </p>
                     <Checklist
                       items={[
@@ -295,7 +284,6 @@ export default function Home() {
                   {step === 1 && (
                     <>
                       <PostTextOptions
-                        initialText={''}
                         selectedPlatforms={selectedPlatforms}
                         platformPosts={platformPosts}
                         setPlatformPosts={setPlatformPosts}
@@ -379,7 +367,7 @@ export default function Home() {
                   {step === 3 && (
                     <>
                       <p className="text-gray-700 dark:text-gray-200 mb-2">
-                        Pick your favorite image from the options. Don't love any of them? Regenerate until you find the one that fits your story.
+                        Pick your favorite image from the options. Don&apos;t love any of them? Regenerate until you find the one that fits your story.
                       </p>
                       <Checklist
                         items={[
@@ -414,10 +402,12 @@ export default function Home() {
                                 setSelectedImageId(image.id);
                               }}
                             >
-                              <img
+                              <Image
                                 src={image.url}
                                 alt={image.prompt}
                                 className="object-cover w-full h-full"
+                                fill
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                               />
                               {imageLoading[image.id] && (
                                 <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
@@ -465,7 +455,7 @@ export default function Home() {
                 <div className="w-full md:w-1/4 md:pr-8 mb-6 md:mb-0">
                   <h2 className={`text-2xl font-bold mb-2${step > 4 ? ' text-gray-400' : ''}`}>Final Post Review</h2>
                   <p className="text-gray-700 dark:text-gray-200">
-                    Preview your posts for each platform. Make final tweaks, approve what's ready, and then export or schedule your content with one click.
+                    Preview your posts for each platform. Make final tweaks, approve what&apos;s ready, and then export or schedule your content with one click.
                   </p>
                   <Checklist
                     items={[

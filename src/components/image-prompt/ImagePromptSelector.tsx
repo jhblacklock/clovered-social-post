@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { brandConfig } from '@/lib/mock-data';
 import { Button } from '@/components/ui/Button';
 
 type Prompt = {
@@ -93,7 +92,7 @@ export function ImagePromptSelector({ onGenerate, selectedPrompt, setSelectedPro
     setPrompts(getRandomPrompts());
     setSelectedPrompt('');
     setEditedPrompt('');
-  }, [blogContent, selectedPlatforms, platformPosts]);
+  }, [blogContent, selectedPlatforms, platformPosts, setSelectedPrompt]);
 
   // Add loading dots animation
   useEffect(() => {

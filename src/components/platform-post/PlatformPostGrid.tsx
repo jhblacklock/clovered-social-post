@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { brandConfig } from '@/lib/mock-data';
 import { Button } from '@/components/ui/Button';
+import Image from 'next/image';
 
 const PLATFORMS = [
   { id: 'instagram', label: 'Instagram' },
@@ -54,21 +54,12 @@ export function PlatformPostGrid({ selectedImageUrl, selectedImagePrompt, select
       isRegenTextLoading: false,
     }))
   );
-  const [loadingDots, setLoadingDots] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState<'buffer' | 'csv' | null>(null);
-
-  // Animate loading dots
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setLoadingDots(prev => prev.length >= 3 ? '' : prev + '.');
-    }, 500);
-    return () => clearInterval(interval);
-  }, []);
 
   // Keep local posts in sync with selectedPlatforms
   useEffect(() => {
     setLocalPosts(prevPosts => {
-      let updated = prevPosts.filter(p => selectedPlatforms.includes(p.id));
+      const updated = prevPosts.filter(p => selectedPlatforms.includes(p.id));
       PLATFORMS.forEach((p, i) => {
         if (selectedPlatforms.includes(p.id) && !updated.find(up => up.id === p.id)) {
           updated.push({
@@ -107,7 +98,7 @@ export function PlatformPostGrid({ selectedImageUrl, selectedImagePrompt, select
       }
       return post;
     }));
-  }, []);
+  }, [platformPosts, setPlatformPosts]);
 
   // Export CSV (mock)
   const handleExportCSV = () => {
@@ -150,9 +141,6 @@ export function PlatformPostGrid({ selectedImageUrl, selectedImagePrompt, select
   // Push to Buffer (mock)
   const handlePushToBuffer = async () => {
     // Only push selected and approved platforms
-    // (In a real implementation, you would send filteredPlatformPosts and filteredLocalPosts)
-    const filteredLocalPosts = localPosts.filter(lp => selectedPlatforms.includes(lp.id) && lp.status === 'ready');
-    const filteredPlatformPosts = platformPosts.filter(p => filteredLocalPosts.some(lp => lp.id === p.id));
     setShowSuccessModal('buffer');
   };
 
@@ -168,37 +156,6 @@ export function PlatformPostGrid({ selectedImageUrl, selectedImagePrompt, select
     setLocalPosts(prev => prev.map(p => p.id === id ? { ...p, status: value } : p));
   };
 
-  const handleShowPromptEdit = (id: string) => {
-    setLocalPosts(prev => prev.map(p => p.id === id ? { ...p, showPromptEdit: true } : p));
-  };
-
-  const handleRegenImage = async (id: string, prompt: string) => {
-    setLocalPosts(prev => prev.map(p => p.id === id ? { ...p, isRegenImageLoading: true, showPromptEdit: false, imagePrompt: prompt } : p));
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setLocalPosts(prev => prev.map(p => p.id === id ? { ...p, imageUrl: `https://picsum.photos/800/600?random=${Math.floor(Math.random()*10000)}`, isRegenImageLoading: false } : p));
-  };
-
-  const handleRegenerateText = async (id: string) => {
-    setLocalPosts(prev => prev.map(p => p.id === id ? { ...p, isRegenTextLoading: true } : p));
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1200));
-    
-    setPlatformPosts(platformPosts.map(post => {
-      if (post.id === id) {
-        const platform = PLATFORMS.find(p => p.id === id);
-        return {
-          ...post,
-          text: `[${platform?.label}] Regenerated post text at ${new Date().toLocaleTimeString()}. This is a new version of the post text.`,
-          hashtags: '#regenerated #new #hashtags'
-        };
-      }
-      return post;
-    }));
-    
-    setLocalPosts(prev => prev.map(p => p.id === id ? { ...p, isRegenTextLoading: false } : p));
-  };
-
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -211,17 +168,14 @@ export function PlatformPostGrid({ selectedImageUrl, selectedImagePrompt, select
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-lg font-semibold capitalize">{PLATFORMS.find(p => p.id === post.id)?.label}</h3>
               </div>
-              <div className="aspect-video relative rounded-lg overflow-hidden">
-                <img
+              <div className="relative w-full h-[300px] mb-4">
+                <Image
                   src={localPost.imageUrl}
-                  alt="Post preview"
-                  className="object-cover w-full h-full"
+                  alt={`Post image for ${localPost.platform}`}
+                  fill
+                  className="object-cover rounded-lg"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
-                {localPost.isRegenImageLoading && (
-                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                    <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
-                  </div>
-                )}
               </div>
               <div>
                 <div className="flex justify-between items-center mb-1">

@@ -2,7 +2,7 @@ import * as React from "react";
 import { twMerge } from "tailwind-merge";
 import clsx from "clsx";
 
-function cn(...inputs: any[]) {
+function cn(...inputs: (string | undefined | null | boolean | { [key: string]: boolean })[]) {
   return twMerge(clsx(inputs));
 }
 

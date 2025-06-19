@@ -9,13 +9,12 @@ const PLATFORMS = [
 ];
 
 type PostTextOptionsProps = {
-  initialText?: string;
   selectedPlatforms: string[];
   platformPosts: { id: string; text: string; hashtags: string }[];
   setPlatformPosts: (posts: { id: string; text: string; hashtags: string }[]) => void;
 };
 
-export function PostTextOptions({ initialText = '', selectedPlatforms, platformPosts, setPlatformPosts }: PostTextOptionsProps) {
+export function PostTextOptions({ selectedPlatforms, platformPosts, setPlatformPosts }: PostTextOptionsProps) {
   // Add placeholder text on mount if empty
   useEffect(() => {
     setPlatformPosts(platformPosts.map(post => {

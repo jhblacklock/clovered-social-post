@@ -43,7 +43,7 @@ export const StepIndicator: React.FC<StepIndicatorProps> = ({ steps, currentStep
               </button>
               {showTooltip && (
                 <div className="absolute top-14 left-1/2 -translate-x-1/2 w-64 bg-gray-900 text-white text-xs rounded-lg px-4 py-2 border border-[#e3e3e3] shadow-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-center">
-                  If you go back and make changes, the rest of the steps will start over and you'll need to complete them again.
+                  If you go back and make changes, the rest of the steps will start over and you&apos;ll need to complete them again.
                 </div>
               )}
               <span className={`mt-2 text-xs font-medium text-center ${isCurrent ? 'text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-300'}`}>{step.label}</span>
